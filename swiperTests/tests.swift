@@ -122,6 +122,37 @@ class ParserTests {
       default: return false
     }
   }
+  func testTryNotation() -> Bool {
+    func p(s : String) -> SResult {
+      return swiperTry(
+        (%"baa")(s)
+      , (%"aaa")(s)
+      )
+    }
+    switch p("aaa") {
+      case let .Success(a,r): return a == "aaa" && r == ""
+      default: return false
+    }
+  }
+  func testBindNotation() -> Bool {
+    let pass = {
+      (s : String) -> Bool in
+      let r = swiperReturn(s) >>= %"a" >>= %"b" >>= %"c"
+      switch r {
+        case let .Success(a,r): return a == "abc" && r == ""
+	default: return false
+      }
+    }
+    let fail = {
+      (s : String) -> Bool in
+      let r = swiperReturn(s) >>= %"b" >>= %"b" >>= %"c"
+      switch r {
+        case let .Success(a,r): return false
+	default: return true
+      }
+    }
+    return pass("abc") && fail("abc")
+  }
   func runTests() {
     let tests = [
       testUnitParser,
@@ -130,7 +161,9 @@ class ParserTests {
       testSumParser,
       testProductParser,
       testStringParser,
-      testBackReferences
+      testBackReferences,
+      testTryNotation,
+      testBindNotation
     ]
     for test in tests {
       print(test() ? "." : "F")

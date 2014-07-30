@@ -116,3 +116,34 @@ operator postfix + {}
   return p * p*
 }
 
+func swiperReturn(s : String) -> SResult {
+  return .Success("",s)
+}
+operator infix >>= {associativity left}
+func >>=(s : SResult, p : Parser) -> SResult {
+  switch s {
+  case let .Success(m,r):
+    switch p(r) {
+    case let .Success(m2,r2): return .Success(m+m2,r2)
+    default: return .Failure
+    }
+  default: return .Failure
+  }
+}
+func swiperTry(ts : [() -> SResult]) -> SResult {
+  if ts.count == 0 {
+    return .Failure
+  }
+  let rest = map(1..<ts.count, { (i : Int) -> (() -> SResult) in ts[i] })
+  switch ts[0]() {
+  case let .Success(m,r): return .Success(m,r)
+  default: return swiperTry(rest)
+  }
+}
+func swiperTry(ts : [@auto_closure () -> SResult]) -> SResult {
+  return swiperTry(map(0..<ts.count, { (i : Int) -> (() -> SResult) in ts[i] }))
+}
+func swiperTry(ts : (@auto_closure () -> SResult)...) -> SResult {
+  return swiperTry(ts)
+}
+

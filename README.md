@@ -8,22 +8,10 @@ Swiper is a work in progress, but here's how it works right now:
 
 ```swift
 func expr(s : String) -> SResult {
-  switch (%"(")(s) {
-  case let .Success(_,r):
-    switch ((expr * %" ")* * expr)(r) {
-    case let .Success(es,r):
-      switch (%")")(r) {
-      case let .Success(_,r): return .Success(es,r)
-      default: return .Failure
-      }
-    default: return .Failure
-    }
-  default:
-    switch (%"0" + %"1")(s) {
-    case let .Success(num,r): return .Success(num,r)
-    default: return .Failure
-    }
-  }
+  return swiperTry(
+    swiperLift(s) >>= %"(" >>= (expr * %" ")* * expr >>= %")"
+  , swiperLift(s) >>= %"0" + %"1"
+  )
 }
 switch expr("((0 1 1) (0 1 0))") {
   case let .Success(_,_): println("Success")
@@ -106,4 +94,19 @@ regular language and how they can be matched with Swiper:
 2. `A + B` matches expressions matched by `A` and expressions matched by `B`.
 3. `A * B` matches the concatenation of expressions matched by `A` and by `B`.
 4. `A*` matches members of the Kleene closure of expressions matched by `A`.
+
+## Combining Parsers
+
+There are two special shorthands for combining parsers which will become even
+more useful once parsing begins to return a more structured value than merely
+the matched string. The shorthands are `>>=` for parser products and
+`swiperTry(...)` for parser sums. They both work at a different level of
+abstraction than the normal `*` and `+` operators.` Here's how they work:
+
+```swift
+// >>= : SResult -> Parser -> SResult
+(%"a")("abc") >>= %"b" == (%"a" * %"b")("abc")
+// swiperTry : (@auto_closure () -> SResult)...
+swiperTry( (%"a")("abc"), (%"b")("abc") ) == (%"a" + %"b")("abc")
+```
 
