@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Swiper by mattneary</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Swiper</h1>
+        <p>A parser DSL for Swift.</p>
+
+        <p class="view"><a href="https://github.com/mattneary/Swiper">View the Project on GitHub <small>mattneary/Swiper</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/mattneary/Swiper/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/mattneary/Swiper/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/mattneary/Swiper">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="swiper" class="anchor" href="#swiper"><span class="octicon octicon-link"></span></a>Swiper</h1>
+
+<p>Swiper is a domain-specific language for writing parsers in Swift, taking
+advantage of swift's powerful capacity for operator overloading as well as its
+type system. Swiper is a work in progress, but here's how it works right now:</p>
+
+<h3>
+<a name="string-parsers" class="anchor" href="#string-parsers"><span class="octicon octicon-link"></span></a>String Parsers</h3>
+
+<div class="highlight highlight-swift"><pre><span class="k">let</span> <span class="n">p</span> <span class="o">=</span> <span class="o">%</span><span class="s">"abc"</span>
+<span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"abc"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+  <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"failed"</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// =&gt; "abc"</span>
+</pre></div>
+
+<h3>
+<a name="sum-parsers" class="anchor" href="#sum-parsers"><span class="octicon octicon-link"></span></a>Sum Parsers</h3>
+
+<div class="highlight highlight-swift"><pre><span class="k">let</span> <span class="n">p</span> <span class="o">=</span> <span class="o">%</span><span class="s">"a"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"b"</span>
+<span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"a"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span>
+    <span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"b"</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span>
+        <span class="n">println</span><span class="p">(</span><span class="s">"Both Passed"</span><span class="p">)</span>
+      <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"`b` Failed"</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"`a` Failed"</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// -&gt; Both Passed</span>
+</pre></div>
+
+<h3>
+<a name="product-parsers" class="anchor" href="#product-parsers"><span class="octicon octicon-link"></span></a>Product Parsers</h3>
+
+<div class="highlight highlight-swift"><pre><span class="k">let</span> <span class="n">p</span> <span class="o">=</span> <span class="o">%</span><span class="s">"a"</span> <span class="o">*</span> <span class="p">(</span><span class="o">%</span><span class="s">"b"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"c"</span><span class="p">)</span>
+<span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"ab"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+  <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"failed"</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// =&gt; "ab"</span>
+</pre></div>
+
+<h3>
+<a name="power-parsers" class="anchor" href="#power-parsers"><span class="octicon octicon-link"></span></a>Power Parsers</h3>
+
+<div class="highlight highlight-swift"><pre><span class="k">let</span> <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="o">%</span><span class="s">"a"</span><span class="p">)</span><span class="o">*</span>
+<span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"aaa"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+  <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"failed"</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// =&gt; "aaa"</span>
+</pre></div>
+
+<p>These parsers map nicely to the definition of a regular language and are
+sufficient for parsing any regular language. However, currently there is
+support internally for recurvsive expression matching. I will be working to
+make a nice interface for working with these parsers.</p>
+
+<h2>
+<a name="parsing-regular-languages" class="anchor" href="#parsing-regular-languages"><span class="octicon octicon-link"></span></a>Parsing Regular Languages</h2>
+
+<p>The inductive rules for building a regular language are pretty simple, and the
+parsers provided map nicely to the rules. Here are the possible values of a
+regular language and how they can be matched with Swiper:</p>
+
+<ol>
+<li>
+<code>charParser</code> matches the singleton <code>{a}</code> for some <code>a</code> in the alphabet.</li>
+<li>
+<code>A + B</code> matches expressions matched by <code>A</code> and expressions matched by <code>B</code>.</li>
+<li>
+<code>A * B</code> matches the concatenation of expressions matched by <code>A</code> and by <code>B</code>.</li>
+<li>
+<code>A*</code> matches members of the Kleene closure of expressions matched by <code>A</code>.</li>
+</ol>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/mattneary">mattneary</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
