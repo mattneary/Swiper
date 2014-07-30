@@ -9,15 +9,39 @@ Swiper is a work in progress, but here's how it works right now:
 ```swift
 func expr(s : String) -> SResult {
   return swiperTry(
-    swiperLift(s) >>= %"(" >>= (expr * %" ")* * expr >>= %")"
-  , swiperLift(s) >>= %"0" + %"1"
+    swiperReturn(s) >>= %"(" >>= (expr * %" ")* * expr >>= %")"
+  , swiperReturn(s) >>= %"0" + %"1"
   )
 }
 switch expr("((0 1 1) (0 1 0))") {
-  case let .Success(_,_): println("Success")
+  case let .Success(m,_): println(m)
   default: println("Failure")
 }
-// => Success
+// => "((0 1 1) (0 1 0))"
+```
+
+## What Remains
+
+The key feature not yet in Swiper is the generation of an abstract syntax tree
+(AST) which can then be used to evaluate the expression. For now, we are
+waiting for Swift to support recursive `enums`. Once we have this, it will work
+like this:
+
+```swift
+enum Expr {
+  case Node(String, String)
+  case Group(String, [Expr])
+}
+func expr(s : String) -> Expr {
+  return swiperTry(
+    swiperReturn(s) >>= %"(" >>= ("list" :-: ((expr * %" ")* * expr)) >>= %")"
+  , swiperReturn(s) >>= ("number" :: (%"0" + %"1"))
+  )
+}
+expr("((0 1) (1 1))")
+// => Group("list",
+//      [Group("list", [Node("number", "0"), Node("number", "1")]),
+//       Group("list", [Node("number", "1"), Node("number", "1")])])
 ```
 
 ## The Parsers
