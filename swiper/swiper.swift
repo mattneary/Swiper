@@ -62,3 +62,36 @@ func +(a : Parser, b : Parser) -> Parser {
     }
   }
 }
+
+func *(a : Parser, b : Parser) -> Parser {
+  return {
+    (s : String) -> SResult
+    in
+    let A = a(s)
+    if countElements(s) == 0 {
+      return .Failure
+    }
+    switch A {
+      case let .Success(mA, rest):
+	let B = b(rest)
+        switch B {
+	  case let .Success(mB, rest2): return .Success(mA+mB, rest2)
+	  default: return B
+	}
+      default: return b(s)
+    }
+  }
+}
+operator prefix * {}
+@prefix func *(ps : () -> [Parser]) -> Parser {
+  return {
+    (string s) -> SResult
+    in
+    var parser = unitParser
+    for p in ps() {
+      parser = parser * p
+    }
+    return parser(s)
+  }
+}
+
