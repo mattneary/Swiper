@@ -1,8 +1,8 @@
 # Swiper
 
 Swiper is a domain-specific language for writing parsers in Swift, taking
-advantage of swift's powerful capacity for operator overloading as well as its
-type system. Swiper is a work in progress, but here's how it works right now:
+advantage of swift's powerful operator overloading as well as its type system.
+Swiper is a work in progress, but here's how it works right now:
 
 ## An Example
 
@@ -10,7 +10,7 @@ type system. Swiper is a work in progress, but here's how it works right now:
 func expr(s : String) -> SResult {
   switch (%"(")(s) {
   case let .Success(_,r):
-    switch (expr*)(r) {
+    switch ((expr * %" ")* * expr)(r) {
     case let .Success(es,r):
       switch (%")")(r) {
       case let .Success(_,r): return .Success(es,r)
@@ -25,10 +25,11 @@ func expr(s : String) -> SResult {
     }
   }
 }
-switch expr("((011)(010))") {
+switch expr("((0 1 1) (0 1 0))") {
   case let .Success(_,_): println("Success")
   default: println("Failure")
 }
+// => Success
 ```
 
 ## The Parsers
