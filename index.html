@@ -32,15 +32,34 @@
 <a name="swiper" class="anchor" href="#swiper"><span class="octicon octicon-link"></span></a>Swiper</h1>
 
 <p>Swiper is a domain-specific language for writing parsers in Swift, taking
-advantage of swift's powerful capacity for operator overloading as well as its
-type system. Swiper is a work in progress, but here's how it works right now:</p>
+advantage of swift's powerful operator overloading as well as its type system.
+Swiper is a work in progress, but here's how it works right now:</p>
+
+<h2>
+<a name="an-example" class="anchor" href="#an-example"><span class="octicon octicon-link"></span></a>An Example</h2>
+
+<div class="highlight highlight-swift"><pre><span class="k">func</span> <span class="nf">expr</span><span class="p">(</span><span class="nl">s</span> <span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SResult</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="n">swiperTry</span><span class="p">(</span>
+    <span class="n">swiperLift</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">"("</span> <span class="o">&gt;&gt;=</span> <span class="p">(</span><span class="n">expr</span> <span class="o">*</span> <span class="o">%</span><span class="s">" "</span><span class="p">)</span><span class="o">*</span> <span class="o">*</span> <span class="n">expr</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">")"</span>
+  <span class="p">,</span> <span class="n">swiperLift</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">"0"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"1"</span>
+  <span class="p">)</span>
+<span class="p">}</span>
+<span class="k">switch</span> <span class="n">expr</span><span class="p">(</span><span class="s">"((0 1 1) (0 1 0))"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"Success"</span><span class="p">)</span>
+  <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"Failure"</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// =&gt; Success</span>
+</pre></div>
+
+<h2>
+<a name="the-parsers" class="anchor" href="#the-parsers"><span class="octicon octicon-link"></span></a>The Parsers</h2>
 
 <h3>
 <a name="string-parsers" class="anchor" href="#string-parsers"><span class="octicon octicon-link"></span></a>String Parsers</h3>
 
 <div class="highlight highlight-swift"><pre><span class="k">let</span> <span class="n">p</span> <span class="o">=</span> <span class="o">%</span><span class="s">"abc"</span>
 <span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"abc"</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+  <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
   <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"failed"</span><span class="p">)</span>
 <span class="p">}</span>
 <span class="c1">// =&gt; "abc"</span>
@@ -51,9 +70,9 @@ type system. Swiper is a work in progress, but here's how it works right now:</p
 
 <div class="highlight highlight-swift"><pre><span class="k">let</span> <span class="n">p</span> <span class="o">=</span> <span class="o">%</span><span class="s">"a"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"b"</span>
 <span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"a"</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span>
+  <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span>
     <span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"b"</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span>
+      <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span>
         <span class="n">println</span><span class="p">(</span><span class="s">"Both Passed"</span><span class="p">)</span>
       <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"`b` Failed"</span><span class="p">)</span>
     <span class="p">}</span>
@@ -67,7 +86,7 @@ type system. Swiper is a work in progress, but here's how it works right now:</p
 
 <div class="highlight highlight-swift"><pre><span class="k">let</span> <span class="n">p</span> <span class="o">=</span> <span class="o">%</span><span class="s">"a"</span> <span class="o">*</span> <span class="p">(</span><span class="o">%</span><span class="s">"b"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"c"</span><span class="p">)</span>
 <span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"ab"</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+  <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
   <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"failed"</span><span class="p">)</span>
 <span class="p">}</span>
 <span class="c1">// =&gt; "ab"</span>
@@ -78,16 +97,24 @@ type system. Swiper is a work in progress, but here's how it works right now:</p
 
 <div class="highlight highlight-swift"><pre><span class="k">let</span> <span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="o">%</span><span class="s">"a"</span><span class="p">)</span><span class="o">*</span>
 <span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"aaa"</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">case</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+  <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
   <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"failed"</span><span class="p">)</span>
 <span class="p">}</span>
 <span class="c1">// =&gt; "aaa"</span>
 </pre></div>
 
-<p>These parsers map nicely to the definition of a regular language and are
-sufficient for parsing any regular language. However, currently there is
-support internally for recurvsive expression matching. I will be working to
-make a nice interface for working with these parsers.</p>
+<h3>
+<a name="recursive-parsers" class="anchor" href="#recursive-parsers"><span class="octicon octicon-link"></span></a>Recursive Parsers</h3>
+
+<div class="highlight highlight-swift"><pre><span class="k">func</span> <span class="nf">p</span><span class="p">(</span><span class="nl">s</span> <span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SResult</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="p">((</span><span class="o">%</span><span class="s">"a"</span> <span class="o">*</span> <span class="n">p</span><span class="p">)</span> <span class="o">+</span> <span class="o">%</span><span class="s">"a"</span><span class="p">)(</span><span class="n">s</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="k">switch</span> <span class="n">p</span><span class="p">(</span><span class="s">"aaa"</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">r</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+  <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"failed"</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="c1">// =&gt; "aaa"</span>
+</pre></div>
 
 <h2>
 <a name="parsing-regular-languages" class="anchor" href="#parsing-regular-languages"><span class="octicon octicon-link"></span></a>Parsing Regular Languages</h2>
@@ -105,7 +132,20 @@ regular language and how they can be matched with Swiper:</p>
 <code>A * B</code> matches the concatenation of expressions matched by <code>A</code> and by <code>B</code>.</li>
 <li>
 <code>A*</code> matches members of the Kleene closure of expressions matched by <code>A</code>.</li>
-</ol>
+</ol><h2>
+<a name="combining-parsers" class="anchor" href="#combining-parsers"><span class="octicon octicon-link"></span></a>Combining Parsers</h2>
+
+<p>There are two special shorthands for combining parsers which will become even
+more useful once parsing begins to return a more structured value than merely
+the matched string. The shorthands are <code>&gt;&gt;=</code> for parser products and
+<code>swiperTry(...)</code> for parser sums. They both work at a different level of
+abstraction than the normal <code>*</code> and <code>+</code> operators.` Here's how they work:</p>
+
+<div class="highlight highlight-swift"><pre><span class="c1">// &gt;&gt;= : SResult -&gt; Parser -&gt; SResult</span>
+<span class="p">(</span><span class="o">%</span><span class="s">"a"</span><span class="p">)(</span><span class="s">"abc"</span><span class="p">)</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">"b"</span> <span class="o">==</span> <span class="p">(</span><span class="o">%</span><span class="s">"a"</span> <span class="o">*</span> <span class="o">%</span><span class="s">"b"</span><span class="p">)(</span><span class="s">"abc"</span><span class="p">)</span>
+<span class="c1">// swiperTry : (@auto_closure () -&gt; SResult)...</span>
+<span class="n">swiperTry</span><span class="p">(</span> <span class="p">(</span><span class="o">%</span><span class="s">"a"</span><span class="p">)(</span><span class="s">"abc"</span><span class="p">),</span> <span class="p">(</span><span class="o">%</span><span class="s">"b"</span><span class="p">)(</span><span class="s">"abc"</span><span class="p">)</span> <span class="p">)</span> <span class="o">==</span> <span class="p">(</span><span class="o">%</span><span class="s">"a"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"b"</span><span class="p">)(</span><span class="s">"abc"</span><span class="p">)</span>
+</pre></div>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/mattneary">mattneary</a></p>
