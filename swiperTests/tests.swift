@@ -36,11 +36,32 @@ class ParserTests {
     }
     return match() && submatch() && failure()
   }
+  func testSumParser() -> Bool {
+    let matchA = {
+      (p : Parser) -> Bool in
+      switch p("a") {
+        case let .Success(a, rest): return a == "a" && rest == ""
+	default: return false
+      }
+    }
+    let matchB = {
+      (p : Parser) -> Bool in
+      switch p("b") {
+        case let .Success(a, rest): return a == "b" && rest == ""
+	default: return false
+      }
+    }
+    let p1 = charParser("a") + charParser("b")
+    let p2 = +{ [charParser("a"), charParser("b")] }
+    return matchA(p1) && matchB(p1)
+      && matchA(p2) && matchB(p2)
+  }
   func runTests() {
     let tests = [
       testUnitParser,
       testZeroParser,
-      testCharParser
+      testCharParser,
+      testSumParser
     ]
     for test in tests {
       print(test() ? "." : "F")

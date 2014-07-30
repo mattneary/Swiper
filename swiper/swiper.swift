@@ -39,3 +39,26 @@ func charParser(c : String) -> Parser {
   }
 }
 
+operator prefix + {}
+@prefix func +(ps : () -> [Parser]) -> Parser {
+  return {
+    (string s) -> SResult
+    in
+    var parser = zeroParser
+    for p in ps() {
+      parser = parser + p
+    }
+    return parser(s)
+  }
+}
+func +(a : Parser, b : Parser) -> Parser {
+  return {
+    (s : String) -> SResult
+    in
+    let A = a(s)
+    switch A {
+      case .Success(_, _): return A
+      default: return b(s)
+    }
+  }
+}
