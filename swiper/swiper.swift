@@ -78,7 +78,7 @@ func *(a : Parser, b : Parser) -> Parser {
 	  case let .Success(mB, rest2): return .Success(mA+mB, rest2)
 	  default: return B
 	}
-      default: return b(s)
+      default: return .Failure
     }
   }
 }

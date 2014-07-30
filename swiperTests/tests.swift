@@ -110,6 +110,18 @@ class ParserTests {
     return anyMatch() && anyMatch2()
       && someFail() && someMatch()
   }
+  func parse(s : String) -> SResult {
+    // NB. This function cannot be nested with `testBackReferences`
+    // because of an apparent bug in Swift.
+    // Cf. https://gist.github.com/mattneary/5848c03f12c246057b2a.
+    return ((%"a" * parse) + %"a")(s)
+  }
+  func testBackReferences() -> Bool {
+    switch parse("aaa") {
+      case let .Success(a,r): return a == "aaa" && r == ""
+      default: return false
+    }
+  }
   func runTests() {
     let tests = [
       testUnitParser,
@@ -117,7 +129,8 @@ class ParserTests {
       testCharParser,
       testSumParser,
       testProductParser,
-      testStringParser
+      testStringParser,
+      testBackReferences
     ]
     for test in tests {
       print(test() ? "." : "F")
