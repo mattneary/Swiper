@@ -68,13 +68,20 @@ class ParserTests {
     let p2 = *{ [charParser("a"), charParser("b")] }
     return match(p1) && match(p2)
   }
+  func testStringParser() -> Bool {
+    switch (%"abc")("abc") {
+      case let .Success(a,r): return a=="abc" && r==""
+      default: return false
+    }
+  }
   func runTests() {
     let tests = [
       testUnitParser,
       testZeroParser,
       testCharParser,
       testSumParser,
-      testProductParser
+      testProductParser,
+      testStringParser
     ]
     for test in tests {
       print(test() ? "." : "F")

@@ -95,3 +95,12 @@ operator prefix * {}
   }
 }
 
+operator prefix % {}
+@prefix func %(p : String) -> Parser {
+  var parser = unitParser
+  for c in p {
+    parser = parser * charParser(String(c))
+  }
+  return parser
+}
+
