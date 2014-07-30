@@ -53,10 +53,18 @@ switch p("aaa") {
 // => "aaa"
 ```
 
-These parsers map nicely to the definition of a regular language and are
-sufficient for parsing any regular language. However, currently there is
-support internally for recurvsive expression matching. I will be working to
-make a nice interface for working with these parsers.
+### Recursive Parsers
+
+```swift
+func p(s : String) -> SResult {
+  return ((%"a" * p) + %"a")(s)
+}
+switch p("aaa") {
+  case .Success(a,r): println(a)
+  default: println("failed")
+}
+// => "aaa"
+```
 
 ## Parsing Regular Languages
 
