@@ -4,12 +4,41 @@ Swiper is a domain-specific language for writing parsers in Swift, taking
 advantage of swift's powerful capacity for operator overloading as well as its
 type system. Swiper is a work in progress, but here's how it works right now:
 
+## An Example
+
+```swift
+func expr(s : String) -> SResult {
+  switch (%"(")(s) {
+  case let .Success(_,r):
+    switch (expr*)(r) {
+    case let .Success(es,r):
+      switch (%")")(r) {
+      case let .Success(_,r): return .Success(es,r)
+      default: return .Failure
+      }
+    default: return .Failure
+    }
+  default:
+    switch (%"0" + %"1")(s) {
+    case let .Success(num,r): return .Success(num,r)
+    default: return .Failure
+    }
+  }
+}
+switch expr("((011)(010))") {
+  case let .Success(_,_): println("Success")
+  default: println("Failure")
+}
+```
+
+## The Parsers
+
 ### String Parsers
 
 ```swift
 let p = %"abc"
 switch p("abc") {
-  case .Success(a,r): println(a)
+  case let .Success(a,r): println(a)
   default: println("failed")
 }
 // => "abc"
@@ -20,9 +49,9 @@ switch p("abc") {
 ```swift
 let p = %"a" + %"b"
 switch p("a") {
-  case .Success(_,_):
+  case let .Success(_,_):
     switch p("b") {
-      case .Success(_,_):
+      case let .Success(_,_):
         println("Both Passed")
       default: println("`b` Failed")
     }
@@ -36,7 +65,7 @@ switch p("a") {
 ```swift
 let p = %"a" * (%"b" + %"c")
 switch p("ab") {
-  case .Success(a,r): println(a)
+  case let .Success(a,r): println(a)
   default: println("failed")
 }
 // => "ab"
@@ -47,7 +76,7 @@ switch p("ab") {
 ```swift
 let p = (%"a")*
 switch p("aaa") {
-  case .Success(a,r): println(a)
+  case let .Success(a,r): println(a)
   default: println("failed")
 }
 // => "aaa"
@@ -60,7 +89,7 @@ func p(s : String) -> SResult {
   return ((%"a" * p) + %"a")(s)
 }
 switch p("aaa") {
-  case .Success(a,r): println(a)
+  case let .Success(a,r): println(a)
   default: println("failed")
 }
 // => "aaa"

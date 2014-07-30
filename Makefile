@@ -6,3 +6,6 @@ lib: swiper/swiper.swift
 tests: lib swiperTests/tests.swift
 	$(swift) -i <(cat swiper/swiper.swift swiperTests/tests.swift)
 
+expr: lib expr.swift
+	$(swift) -i <(cat swiper/swiper.swift expr.swift)
+
