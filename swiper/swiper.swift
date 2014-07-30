@@ -104,3 +104,15 @@ operator prefix % {}
   return parser
 }
 
+operator postfix * {}
+@postfix func *(p : Parser) -> Parser {
+  var options : [Parser] = [unitParser, unitParser]
+  var pattern = +{ options }
+  options[0] = *{ [p, pattern] }
+  return pattern
+}
+operator postfix + {}
+@postfix func +(p : Parser) -> Parser {
+  return p * p*
+}
+

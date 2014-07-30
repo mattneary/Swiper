@@ -74,6 +74,42 @@ class ParserTests {
       default: return false
     }
   }
+  func testPowerParser() -> Bool {
+    let anyMatch = {
+      () -> Bool in
+      let pattern = (%"a")*
+      switch pattern("aaa") {
+	case let .Success(a, r): return a=="aaa" && r==""
+	default: return false
+      }
+    }
+    let anyMatch2 = {
+      () -> Bool in
+      let pattern = (%"a")*
+      switch pattern("") {
+	case let .Success(a, r): return a=="" && r==""
+	default: return false
+      }
+    }
+    let someMatch = {
+      () -> Bool in
+      let pattern = (%"a")+
+      switch pattern("aaa") {
+	case let .Success(a, r): return a=="aaa" && r==""
+	default: return false
+      }
+    }
+    let someFail = {
+      () -> Bool in
+      let pattern = (%"a")+
+      switch pattern("aaa") {
+	case let .Success(_,_): return false
+	default: return true
+      }
+    }
+    return anyMatch() && anyMatch2()
+      && someFail() && someMatch()
+  }
   func runTests() {
     let tests = [
       testUnitParser,
