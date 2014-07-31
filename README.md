@@ -24,8 +24,9 @@ switch expr("((0 1 1) (0 1 0))") {
 
 The key feature not yet in Swiper is the generation of an abstract syntax tree
 (AST) which can then be used to evaluate the expression. For now, we are
-waiting for Swift to support recursive `enums`. Once we have this, it will work
-like this:
+waiting for Swift to support recursive `enums`. Once we have this, as well as a
+monad transformer basis rather than the current simple monad, it will work like
+this:
 
 ```swift
 enum Expr {
@@ -34,9 +35,13 @@ enum Expr {
 }
 func expr(s : String) -> Expr {
   return swiperTry(
-    swiperReturn(s) >>= %"(" >>= ("list" :-: ((expr * %" ")* * expr)) >>= %")"
-  , swiperReturn(s) >>= ("number" :: (%"0" + %"1"))
-  )
+    doo( { "_"    <- %"(" }
+        ,{ "list" <- (expr * %" ")* * expr }
+        ,{ "_"    <- %")" }
+        ,{ <<- "list" :-: $0("list") })
+   ,doo( { "number" <- %"0" + %"1" }
+        ,{ <<- "number" :: $0("number") })
+  )(s)
 }
 expr("((0 1) (1 1))")
 // => Group("list",
