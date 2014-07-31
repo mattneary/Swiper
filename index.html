@@ -40,15 +40,44 @@ Swiper is a work in progress, but here's how it works right now:</p>
 
 <div class="highlight highlight-swift"><pre><span class="k">func</span> <span class="nf">expr</span><span class="p">(</span><span class="nl">s</span> <span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SResult</span> <span class="p">{</span>
   <span class="k">return</span> <span class="n">swiperTry</span><span class="p">(</span>
-    <span class="n">swiperLift</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">"("</span> <span class="o">&gt;&gt;=</span> <span class="p">(</span><span class="n">expr</span> <span class="o">*</span> <span class="o">%</span><span class="s">" "</span><span class="p">)</span><span class="o">*</span> <span class="o">*</span> <span class="n">expr</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">")"</span>
-  <span class="p">,</span> <span class="n">swiperLift</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">"0"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"1"</span>
+    <span class="n">swiperReturn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">"("</span> <span class="o">&gt;&gt;=</span> <span class="p">(</span><span class="n">expr</span> <span class="o">*</span> <span class="o">%</span><span class="s">" "</span><span class="p">)</span><span class="o">*</span> <span class="o">*</span> <span class="n">expr</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">")"</span>
+  <span class="p">,</span> <span class="n">swiperReturn</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;&gt;=</span> <span class="o">%</span><span class="s">"0"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"1"</span>
   <span class="p">)</span>
 <span class="p">}</span>
 <span class="k">switch</span> <span class="n">expr</span><span class="p">(</span><span class="s">"((0 1 1) (0 1 0))"</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">_</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"Success"</span><span class="p">)</span>
+  <span class="k">case</span> <span class="k">let</span> <span class="p">.</span><span class="n">Success</span><span class="p">(</span><span class="n">m</span><span class="p">,</span><span class="n">_</span><span class="p">)</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
   <span class="k">default</span><span class="o">:</span> <span class="n">println</span><span class="p">(</span><span class="s">"Failure"</span><span class="p">)</span>
 <span class="p">}</span>
-<span class="c1">// =&gt; Success</span>
+<span class="c1">// =&gt; "((0 1 1) (0 1 0))"</span>
+</pre></div>
+
+<h2>
+<a name="what-remains" class="anchor" href="#what-remains"><span class="octicon octicon-link"></span></a>What Remains</h2>
+
+<p>The key feature not yet in Swiper is the generation of an abstract syntax tree
+(AST) which can then be used to evaluate the expression. For now, we are
+waiting for Swift to support recursive <code>enums</code>. Once we have this, as well as a
+monad transformer basis rather than the current simple monad, it will work like
+this:</p>
+
+<div class="highlight highlight-swift"><pre><span class="k">enum</span> <span class="n">Expr</span> <span class="p">{</span>
+  <span class="k">case</span> <span class="n">Node</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="n">String</span><span class="p">)</span>
+  <span class="k">case</span> <span class="n">Group</span><span class="p">(</span><span class="n">String</span><span class="p">,</span> <span class="p">[</span><span class="n">Expr</span><span class="p">])</span>
+<span class="p">}</span>
+<span class="k">func</span> <span class="n">expr</span><span class="p">(</span><span class="nl">s</span> <span class="p">:</span> <span class="n">String</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Expr</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="n">swiperTry</span><span class="p">(</span>
+    <span class="n">doo</span><span class="p">(</span> <span class="p">{</span> <span class="s">"_"</span>    <span class="o">&lt;-</span> <span class="o">%</span><span class="s">"("</span> <span class="p">}</span>
+        <span class="p">,{</span> <span class="s">"list"</span> <span class="o">&lt;-</span> <span class="p">(</span><span class="n">expr</span> <span class="o">*</span> <span class="o">%</span><span class="s">" "</span><span class="p">)</span><span class="o">*</span> <span class="o">*</span> <span class="n">expr</span> <span class="p">}</span>
+        <span class="p">,{</span> <span class="s">"_"</span>    <span class="o">&lt;-</span> <span class="o">%</span><span class="s">")"</span> <span class="p">}</span>
+        <span class="p">,{</span> <span class="o">&lt;&lt;-</span> <span class="s">"list"</span> <span class="o">:-:</span> <span class="err">$</span><span class="mi">0</span><span class="p">(</span><span class="s">"list"</span><span class="p">)</span> <span class="p">})</span>
+   <span class="p">,</span><span class="n">doo</span><span class="p">(</span> <span class="p">{</span> <span class="s">"number"</span> <span class="o">&lt;-</span> <span class="o">%</span><span class="s">"0"</span> <span class="o">+</span> <span class="o">%</span><span class="s">"1"</span> <span class="p">}</span>
+        <span class="p">,{</span> <span class="o">&lt;&lt;-</span> <span class="s">"number"</span> <span class="o">::</span> <span class="err">$</span><span class="mi">0</span><span class="p">(</span><span class="s">"number"</span><span class="p">)</span> <span class="p">})</span>
+  <span class="p">)(</span><span class="n">s</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="n">expr</span><span class="p">(</span><span class="s">"((0 1) (1 1))"</span><span class="p">)</span>
+<span class="c1">// =&gt; Group("list",</span>
+<span class="c1">//      [Group("list", [Node("number", "0"), Node("number", "1")]),</span>
+<span class="c1">//       Group("list", [Node("number", "1"), Node("number", "1")])])</span>
 </pre></div>
 
 <h2>
